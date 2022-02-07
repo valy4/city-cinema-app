@@ -3,7 +3,7 @@ import styled from "styled-components";
 export default function Header(props: any) {
   return (
     <Head className="titleSearch">
-      <h1 className="title">Sav State</h1>
+      <h1 className="title">City Cinema</h1>
       <div className="inputButton">
         <input
           className="inputField"
