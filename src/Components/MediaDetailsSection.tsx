@@ -10,32 +10,37 @@ export default function MediaDetailsSection() {
   const [seasons, setSeasons] = useState<any[]>([]);
   const [episodes, setEpisodes] = useState<any[]>([]);
 
+  // get shows by id when page loads and save it in state
+
   useEffect(() => {
     fetch(`https://api.tvmaze.com/shows/${id}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("Details", data);
         setFullDetails(data);
       });
   }, [id]);
+
+  // get show's seasons based on id and save it in state
 
   useEffect(() => {
     fetch(`https://api.tvmaze.com/shows/${id}/seasons`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("seasons", data);
         setSeasons(data);
       });
   }, [id]);
+
+  // get show's episodes based on id and save it in state
 
   useEffect(() => {
     fetch(`https://api.tvmaze.com/shows/${id}/episodes`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("episodes", data);
         setEpisodes(data);
       });
   }, [id]);
+
+  // assign corresponding episodes to each season
 
   const matchedEpisodes = seasons.reduce((acc: any, i: any) => {
     acc[i.number] = {
@@ -58,6 +63,7 @@ export default function MediaDetailsSection() {
         <TitleDetails>
           <h1>
             {fullDetails.name} {} <span>(</span>
+            {/* display only premiered year  */}
             {fullDetails.premiered?.slice(0, 4)}
             <span>)</span>
           </h1>
@@ -72,32 +78,40 @@ export default function MediaDetailsSection() {
               {fullDetails.status}
             </p>
             <Genres>
-              <span style={{ fontWeight: "bold" }}>Genres:</span>
-              {fullDetails.genres?.length > 0
-                ? fullDetails.genres?.join(" ,")
-                : " No genres"}
+              <p style={{ marginTop: 0 }}>
+                <span style={{ fontWeight: "bold" }}>Genres: </span>{" "}
+                {fullDetails.genres?.length > 0
+                  ? // genres separated by comma
+                    fullDetails.genres?.join(", ")
+                  : " No genres"}
+              </p>
             </Genres>
           </Details>
         </TitleDetails>
       </DetailsPoster>
-      {Object.entries(matchedEpisodes).map((season: any)=> {
-        return(
+
+      {/* map through matched seasons/episodes and display episodes based on season */}
+
+      {Object.entries(matchedEpisodes).map((season: any) => {
+        return (
           <>
             <h1>season {season[0]}</h1>
             <EpisodesContainer>
-              {season[1].episodes.map((ep: any) =>{
+              {/* map through all episodes and display episode's details  */}
+              {season[1].episodes.map((episode: any) => {
                 return (
                   <EpisodeTitlePoster>
-                    <a href={ep.url}>
+                    {/* link to TV MAZE episode url */}
+                    <a href={episode.url}>
                       <PosterEpisodes
                         src={
-                          ep.image
-                            ? ep.image?.original
+                          episode.image
+                            ? episode.image?.original
                             : noImageAvailable
                         }
                       />
                       <EpisodeTitle>
-                        <Text>{ep?.name}</Text>
+                        <Text>{episode?.name}</Text>
                       </EpisodeTitle>
                     </a>
                   </EpisodeTitlePoster>
@@ -105,7 +119,7 @@ export default function MediaDetailsSection() {
               })}
             </EpisodesContainer>
           </>
-        )
+        );
       })}
     </div>
   );
@@ -137,7 +151,7 @@ const DetailsPoster = styled.div`
   display: flex;
   margin: 3rem;
 `;
-const Genres = styled.p`
+const Genres = styled.div`
   display: flex;
   flex-direction: row;
 `;
